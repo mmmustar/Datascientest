@@ -1,0 +1,13 @@
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+Vagrant.configure("2") do |config|
+	config.vm.define "serveur_web" do |serveur_web|
+	serveur_web.vm.network "forwarded_port", guest: 80, host: 9000
+	serveur_web.vm.provider "docker" do	
+	serveur_web.image = "datascientest:vagrant"
+	serveur_web.has_ssh = true
+	serveur_web.privileged = true
+	serveur_web.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+		serveur_web.name = "serveur_web"
+	end
+end
+end
