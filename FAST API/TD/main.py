@@ -1,16 +1,25 @@
 from fastapi import FastAPI
 import requests
 import pandas as pd
-
+import sys
 
 api = FastAPI()
-csv = "https://dst-de.s3.eu-west-3.amazonaws.com/fastapi_fr/questions.csv"
+@api.get("/")
+def running():
+    return print("API OK")
 
+users = {
+    "alice": "wonderland",
+    "bob": "builder",
+    "clementine": "mandarine"
+}
 
-@api.get('/')
-
-#chargement du csv
-df = pd.read_csv(csv)
+@api.post("/login")
+def login(username: str, password: str):
+    if username in users and users[username] == password:
+        return {"message": "Login OK"}
+    else:
+        return {"message": "Erreur d'identification"}
 
 
 
