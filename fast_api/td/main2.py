@@ -55,35 +55,30 @@ def login(credentials: Annotated[HTTPBasicCredentials, Depends(security)],):
         )
     return current_username
 
-def filter(subjects,use):
-    db = []
-    if use is None and subjects is not None:
-        db = df[df["subjects"].isin(subjects)]
-    elif use is not None and subjects is None:
-        db = (df["use"] == use )
-    elif use is None and subjects is None:
-        db = df
-    else:
-        db = df[(df['use'] == use) & (df['subjects'].isin(subjects))]
-    return db
 
 @api.get("/")
 def running():
     return "API OK"
 
-@api.post("/questions")
-def do_qcm(subjects: list = None, use: str = None, count: int = 5):
+@api.get("/qcm")
+def get_qcm(subjects: list[str], use: str = None,  count: int = 5, current_user: str = Depends(login)):
+    for subject in subjects:
+        if subject not in sub_list:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid subject: {subject}")
+    if use not in use_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid 'use' value")
     if count not in [5, 10, 20]:
-        raise ValueError("Invalid 'count' value. Must be 5, 10, or 20.")
-    if use is not None and use not in use_list:
-        raise ValueError("Invalid value for 'use'. Available values are : Test de positionnement, Total Bootcamp,  Test de validation")
-    if subjects is not None and any (subject not in sub_list for subject in subjects):
-        raise ValueError("Invalid value for 'subjects'. Available values are BDD, Systèmes distribués, Streaming de données, Docker, Classification, Systèmes distribués, Data Science, Machine Learning, Automation, Streaming de données")
-    db = filter(subjects, use)
-    qcm = db.sample(n=count, replace=False)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Number of questions must be 5, 10, or 20")
+    pool =df.copy()
+    if use is not None:
+        pool = pool[pool['use'] == use]
+    if subjects is not None:
+        pool = pool[pool['subject'].isin(subjects)]
+    pool = df[(df['use'] == use) & (df['subject'].isin(subjects))]
+    qcm = pool.sample(n=min(len(pool), count))
     return qcm
-
-@api.get("/admin")
+    
+@api.post("/admin")
 def add_question(question : str, subject : str, use : str, correct : str,  responseA : str, responseB : str, responseC : str,responseD : str, remark : str, current_user: str = Depends(login)):
     if current_user != "admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin privileges required")
