@@ -73,6 +73,9 @@ def ok(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
 @api.get("/questions")
 def get_questions(use: str = None, subjects: list = None, count: int = 5,credentials: HTTPBasicCredentials = Depends(security)):
     login(credentials)
+    ds = df[subjects].unique()
+    if subjects not in ds:
+        raise ValueError("Invalid 'subjects' value. choose betwee" + ds )
     if count not in [5, 10, 20]:
         raise ValueError("Invalid 'count' value. Must be 5, 10, or 20.")
     db = filter(use, subjects)
