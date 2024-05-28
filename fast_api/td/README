@@ -1,0 +1,6 @@
+## RUN
+$ docker compose build
+$ docker compose up
+
+## LAUNCH
+http://localhost:1234/docs#/

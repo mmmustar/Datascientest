@@ -36,6 +36,7 @@ sub_list = ["BDD", "Systèmes distribués", "Streaming de données", "Docker", "
 def login(credentials: Annotated[HTTPBasicCredentials, Depends(security)],):
     current_username = credentials.username
     current_password = credentials.password
+
     if current_username not in users or users[current_username] != current_password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -76,20 +77,20 @@ def qcm_gen(
         for subject in subjects:
             if subject not in sub_list:
                 raise HTTPException(status_code=400, detail="Invalid subject. Possible values can be one or multiple of 'BDD', 'Systèmes distribués', 'Streaming de données', 'Docker', 'Classification', 'Data Science', 'Machine Learning', 'Automation'")
-    
+
     if use:
         df = df[df['use'] == use]
 
     if subjects:
         df = df[df['subject'].isin(subjects)]
-    
+
     if len(df) < 5:
         raise HTTPException(status_code=400, detail="Question pool is too short. Please change parameters.")
-    
+
     if len(df) < count:
         warnings.warn("Question pool is too short. All available questions are being provided.")
         count = len(df)
-    
+
     df_index = random.sample(list(df.index),count)
     qcm = df.loc[df_index]
     return  qcm
