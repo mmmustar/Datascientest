@@ -1,0 +1,32 @@
+commande pour verifier si l'api tourne :
+curl -X 'GET'   'http://127.0.0.1:8000/' \
+
+commande pour ajouter une question au fichier csv (as admin):
+curl -X 'POST' \
+  'http://127.0.0.1:8000/admin' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "question": "Q_value1",
+  "subject": "Q_value2",
+  "use": "Q_value3",
+  "correct": "Q_value4",
+  "responseA": "Q_value5",
+  "responseB": "Q_value6",
+  "responseC": "Q_value7",
+  "responseD": "Q_value8",
+  "remark": "Q_value9"
+}' \
+  -u username:password
+
+exemple
+curl -X 'POST' 'http://127.0.0.1:8000/admin' -H 'Content-Type: application/json'  -d '{  "question": "la question",  "subject": "BDD",  "use": "Test de positionnement",  "correct": "A",  "responseA": "la réponse A",  "responseB": "la réponse B",  "responseC": "la réponse C",  "responseD": "la réponse D",  "remark": "la remarque"}' -u admin:4dm1N
+
+
+Commnande pour récuperer un qcm selon use(use_value), subject(subject_value1, subject_value2, ...) et count(nombre de questions):
+curl -X 'GET' \
+  'http://127.0.0.1:8000/qcm?use=use_value&subjects=subject_value1&subjects=subject_value2&...&count=5' \
+  -u username:password
+
+Exemple : 
+curl -X 'GET' 'http://127.0.0.1:8000/qcm?use=Test%20de%20positionnement&subjects=BDD&subjects=Docker&count=5' -u alice:wonderland
+
