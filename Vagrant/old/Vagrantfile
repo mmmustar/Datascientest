@@ -1,0 +1,16 @@
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "docker" do |container|
+    container.build_dir = "."
+    container.name = "exo"
+    container.remains_running = false
+    container.cmd = ["nginx", "-g", "daemon off;"]
+  end
+
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 443, host: 8443
+  config.vm.synced_folder "./etc/nginx", "/etc/nginx"
+  config.vm.synced_folder "./var/www", "/var/WWW"
+
+end
