@@ -1,0 +1,1 @@
+'curl https://ipv4.cloudns.net/api/dynamicURL/?q=NzM3MjE2NDo0OTgwNjE1ODE6YzFjZDgxZjJjNDUxMTNlZjljZmMxNWMzOWVkM2UwMGEyNDM2NTBkODY5NmYzNjQ5YmJhN2I2MDM0MzgyZTI3Nw'

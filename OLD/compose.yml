@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  exo:
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+      - "8043:443"
+    volumes:
+      - ./var/www:/var/www
+      - /var/log/nginx
+      - /var/www/html
+      - /var/lib/mysql

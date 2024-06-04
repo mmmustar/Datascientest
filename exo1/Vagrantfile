@@ -1,0 +1,19 @@
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
+Vagrant.configure("2") do |config|
+  config.vm.define "admin" do |admin|
+    admin.vm.network :private_network, ip: "192.168.0.18", netmask: 24
+    admin.vm.network "forwarded_port", guest: 80, host: 8080
+    admin.vm.network "forwarded_port", guest: 443, host: 8443
+
+    config.vm.synced_folder "/home/ubuntu/config", "/home/vagrant/config"
+
+    admin.vm.provider "docker" do |docker|
+      docker.build_dir = "."
+      docker.has_ssh = true
+      docker.privileged = true
+      docker.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+      docker.name = "admin"
+    end
+  end
+end
