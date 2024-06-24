@@ -106,4 +106,93 @@ pipeline = [
 
 pprint(list(books.aggregate(pipeline)))
 
+print("Add Year, month, day : ")
+#use addFields insteadof $project
+pipeline = [
+       {
+        "$addFields": {
+            "publishedYear": { "$year": "$publishedDate" },
+            "publishedMonth": { "$month": "$publishedDate" },
+            "publishedDay": { "$dayOfMonth": "$publishedDate" }
+        }
+    },
+    {
+        "$match": {
+            "publishedYear": { "$gt": 2009 }
+        }
+    },
+    {
+        "$limit": 20
+    },
 
+]
+
+
+pprint(list(books.aggregate(pipeline)))
+
+print("Add athorN")
+pipeline = [
+    {
+        "$project": {
+            "numAuthors": { "$size": "$authors" }
+        }
+    },
+    {
+        "$group": {
+            "_id": None,
+            "maxNumAuthors": { "$max": "$numAuthors" }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "maxNumAuthors": 1
+        }
+    }
+]
+numAuthor = list(books.aggregate(pipeline))
+numAuthor = numAuthor[0]['maxNumAuthors']
+newFields =  {}
+for i in range(numAuthor):
+    newFields['author' + str(i + 1)] = { "$arrayElemAt": ["$authors", i] }
+
+pipeline = [
+    {
+        "$addFields": newFields
+    },
+    {
+        "$sort": { "publishedDate": 1 }
+    },
+    {
+        "$limit": 20
+    }
+]
+pprint(list(books.aggregate(pipeline)))
+
+print("Most plublished books by athors")
+
+pipeline = [
+    {
+        "$project": {
+            "firstAuthor": { "$arrayElemAt": ["$authors", 0] }
+        }
+    },
+    {
+        "$group": {
+            "_id": "$firstAuthor",
+            "numPublications": { "$sum": 1 }
+        }
+    },
+    {
+        "$match": {
+            "_id": { "$ne": None }
+        }
+    },
+    {
+        "$sort": { "numPublications": -1 }
+    },
+    {
+        "$limit": 10
+    }
+]
+pprint(list(books.aggregate(pipeline)))
